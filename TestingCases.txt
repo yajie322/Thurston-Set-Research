@@ -1,0 +1,21 @@
+Fix: m = 2, n = 16, E = {+1, -1}
+w in {0,1}^N
+
+Admissibility (evenflipstest & shifttest)
+
+Test 1 
+w = 0000000000000000бн 
+
+Test 2
+w = 1001100110011001бн
+
+Test 3
+w = 0100100001001000бн
+
+Test 4
+w = 1010010101101000бн
+
+Test 5
+w = 0101101110111101бн
+
+
