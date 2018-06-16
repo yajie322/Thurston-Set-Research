@@ -9,8 +9,8 @@ bool ShiftTest(vector<int> const &word, vector<int> const &cumulative_sign);
 
 vector<vector<int> > PossibleWords(int m, int n);
 vector<vector<int> > PossibleSigns(int m);
-vector<int> CumulativeSigns(vector<int> word, vector<int> sign);
-vector<int> ConsturctDigits(vector<int> word, vector<int> cumulative_sign, vector<int> signs);
+vector<int> CumulativeSigns(vector<int> const &word, vector<int> const &sign);
+vector<int> ConsturctCoeffs(vector<int> const &word, vector<int> const &cumulative_sign, vector<int> const &signs);
 vector<double> GetRootsByTypeBySign(int m, int n, vector<int> sign);
 vector<double> GetRootsByType(int m, int n);
 
@@ -85,7 +85,7 @@ vector<vector<int> > PossibleSigns(int m) {
 	return possible_signs;
 }
 
-vector<int> CumulativeSigns(vector<int> word, vector<int> signs) {
+vector<int> CumulativeSigns(vector<int> const &word, vector<int> const &signs) {
 	vector<int> c;
 	c.push_back(1);
 	for (int i = 0; i < word.size()-1; i++) {
@@ -94,7 +94,7 @@ vector<int> CumulativeSigns(vector<int> word, vector<int> signs) {
 	return c;
 }
 
-vector<int> ConsturctCoeffs(vector<int> word, vector<int> cumulative_sign, vector<int> signs) {
+vector<int> ConsturctCoeffs(vector<int> const &word, vector<int> const &cumulative_sign, vector<int> const &signs) {
 	vector<int> coeffs;
 	for (int i = word.size()-1; i >= 0; i--) {
 		coeffs.push_back(0 - cumulative_sign[i] * (word[i] + (1-signs[word[i]]) / 2));
@@ -162,7 +162,7 @@ vector<double> GetRootsByType(int m, int n) {
 
 
 int main() {
-	vector<double> results = GetRootsByType(2, 19);
+	vector<double> results = GetRootsByType(2, 21);
 	for (vector<double>::iterator it = results.begin(); it != results.end(); ++it) {
 			cout << ' ' << *it;
 		}
