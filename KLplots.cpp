@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <gsl/gsl_poly.h>
 
 using namespace std;
 
@@ -7,30 +8,33 @@ bool EvenFlipTest(vector<int> const &word, vector<int> const &cumulative_sign, v
 bool ShiftTest(vector<int> const &word, vector<int> const &cumulative_sign);
 
 vector<vector<int> > PossibleWords(int m, int n);
-vector<int> PossibleSigns(int m);
+vector<vector<int> > PossibleSigns(int m);
 vector<int> CumulativeSigns(vector<int> word, vector<int> sign);
-vector<int> GetRootsByTypeBySign(int m, int n, vector<int> sign);
-vector<int> GetRootsByType(int m, int n);
+vector<int> ConsturctDigits(vector<int> word, vector<int> cumulative_sign, vector<int> signs);
+vector<double> GetRootsByTypeBySign(int m, int n, vector<int> sign);
+vector<double> GetRootsByType(int m, int n);
 
 bool EvenFlipTest(vector<int> const &word, vector<int> const &cumulative_sign, vector<int> const &signs) {
 	int n = word.size() - 1;
-	return cumulative_sign[n] * signs[word[n]] == 1
-
+	return cumulative_sign[n] * signs[word[n]] == 1;
 }
 
 bool ShiftTest(vector<int> const &word, vector<int> const &cumulative_sign) {
 	vector<int> w1 = word;
-	for (int i = 0, i < word.size(); i++) {
-		w1.insert(w1.begin(), w1.pop_back());
+	for (int i = 0; i < word.size(); i++) {
+		w1.insert(w1.begin(), w1.back());
+		w1.pop_back();
 
 		int pos, order;
 		for (pos = 0; pos < word.size(); pos++) {
-			if (word[pos] != w1[pos]) {
-				if (word[pos] < w1[pos]) order = 1;
-				else order = -1;
-				
-				csign = cumulative_sign[pos];
-				if (csign == order) return false;
+			if (word[pos] != w1[pos]) break;
+		}
+		if (pos < word.size()) {
+			if (word[pos] < w1[pos]) order = 1;
+			else order = -1;
+			int csign = cumulative_sign[pos];
+			if (csign == order) {
+				return false;
 			}
 		}
 	}
@@ -84,42 +88,91 @@ vector<vector<int> > PossibleSigns(int m) {
 vector<int> CumulativeSigns(vector<int> word, vector<int> signs) {
 	vector<int> c;
 	c.push_back(1);
-	for (int i = 0; i < word.size(); i++) {
+	for (int i = 0; i < word.size()-1; i++) {
 		c.push_back(signs[word[i]] * c.back());
 	}
 	return c;
 }
 
-vector<int> GetRootsByTypeBySign(int m, int n, vector<int> signs) {
+vector<int> ConsturctCoeffs(vector<int> word, vector<int> cumulative_sign, vector<int> signs) {
+	vector<int> coeffs;
+	for (int i = word.size()-1; i >= 0; i--) {
+		coeffs.push_back(0 - cumulative_sign[i] * (word[i] + (1-signs[word[i]]) / 2));
+	}
+	coeffs[0]--;
+	coeffs.push_back(1);
+	return coeffs;
+}
+
+vector<double> GetRootsByTypeBySign(int m, int n, vector<int> signs) {
+	vector<double> roots;
 	vector<vector<int> > possible_words = PossibleWords(m, n);
 	for (int i = 0; i < possible_words.size(); i++) {
 		vector<int> word = possible_words[i];
 		vector<int> cumulative_sign = CumulativeSigns(word, signs);
 		if (EvenFlipTest(word, cumulative_sign, signs) && ShiftTest(word, cumulative_sign)) {
-			// Consturct polynomial and solve it 
+			vector<int> coeffs = ConsturctCoeffs(word, cumulative_sign, signs);
+			double poly[n+1];
+			double ans[2*n];
+			for (int pos = 0; pos <= n; pos++) {
+				poly[pos] = double(coeffs[pos]);
+			}
+
+			gsl_poly_complex_workspace *workspace = gsl_poly_complex_workspace_alloc(n+1);
+			gsl_poly_complex_solve(poly, n+1, workspace, ans);
+			gsl_poly_complex_workspace_free(workspace);
+
+			for (int j = 0; j < 2*n; j++) {
+				roots.push_back(ans[j]);
+			}
 		}
 	}
+	return roots;
 }
 
-// TO DO
-vector<int> GetRootsByType(int m, int n) {
+vector<double> GetRootsByType(int m, int n) {
+	vector<double> roots;
 	vector<vector<int> > possible_signs = PossibleSigns(m);
 	for (int i = 0; i < possible_signs.size(); i++) {
-		vector<int> sign = possible_signs[i];
+		vector<int> signs = possible_signs[i];
+		vector<vector<int> > possible_words = PossibleWords(m, n);
+		for (int j = 0; j < possible_words.size(); j++) {
+			vector<int> word = possible_words[j];
+			vector<int> cumulative_sign = CumulativeSigns(word, signs);
+			if (EvenFlipTest(word, cumulative_sign, signs) && ShiftTest(word, cumulative_sign)) {
+				vector<int> coeffs = ConsturctCoeffs(word, cumulative_sign, signs);
+				double poly[n+1];
+				double ans[2*n];
+				for (int pos = 0; pos <= n; pos++) {
+					poly[pos] = double(coeffs[pos]);
+				}
 
-		// call GetRootsByTypeBySign
+				gsl_poly_complex_workspace *workspace = gsl_poly_complex_workspace_alloc(n+1);
+				gsl_poly_complex_solve(poly, n+1, workspace, ans);
+				gsl_poly_complex_workspace_free(workspace);
+
+				for (int j = 0; j < 2*n; j++) {
+					roots.push_back(ans[j]);
+				}
+			}
+		}
 	}
+	return roots;
 }
 
 
 int main() {
-	vector<vector<int> > results = PossibleWords(2, 19);
-
-	for (vector<vector<int> >::iterator it = results.begin(); it != results.end(); ++it) {
-		for (vector<int>::iterator it2 = it->begin(); it2 != it->end(); ++it2) {
-			cout << ' ' << *it2;
+	vector<double> results = GetRootsByType(2, 19);
+	for (vector<double>::iterator it = results.begin(); it != results.end(); ++it) {
+			cout << ' ' << *it;
 		}
 		cout << '\n';
-	}
+
+	// for (vector<vector<int> >::iterator it = results.begin(); it != results.end(); ++it) {
+	// 	for (vector<int>::iterator it2 = it->begin(); it2 != it->end(); ++it2) {
+	// 		cout << ' ' << *it2;
+	// 	}
+	// 	cout << '\n';
+	// }
 	return 0;
 }
