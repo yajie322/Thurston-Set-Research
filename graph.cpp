@@ -39,7 +39,7 @@ void plotResults(double* xData, double* yData, int dataSize) {
   tempDataFileName = "graph.txt";     //this will store all of the point external file. Change the name if necessary
   gnuplotPipe = popen("gnuplot","w");
   if (gnuplotPipe) {
-      fprintf(gnuplotPipe,"plot \"%s\" \n",tempDataFileName);
+      fprintf(gnuplotPipe,"plot \"%s\" lt rgb \"blue\" \n",tempDataFileName); //change the color of the points here
       fflush(gnuplotPipe);
       tempDataFile = fopen(tempDataFileName,"w");
       for (i=0; i <= dataSize; i++) {
