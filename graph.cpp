@@ -1,32 +1,29 @@
 // Requires gnuplot in order to plot graphs
-// Currently only able to plot functions, working on a way to graph a set of tuples
+// Once the plot as been created, you will need to save the graph as a separate file.
+// Unfortunately, I could not make the code do this by default
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <vector>
+#include <cstdlib>
 
 void plotResults(double* xData, double* yData, int dataSize);
 
 int main() {
   int i = 0;
-  int nIntervals = 100;
-  double intervalSize = 1.0;
-  double stepSize = intervalSize/nIntervals;
+  int nIntervals = 100000;        //edit this to be the number of total points
 
   double* xData = (double*) malloc((nIntervals+1)*sizeof(double));
   double* yData = (double*) malloc((nIntervals+1)*sizeof(double));
 
-  xData[0] = 0.0;
-  double x0 = 0.0;
+
   for (i = 0; i < nIntervals; i++) {
-      x0 = xData[i];
-      xData[i+1] = x0 + stepSize;
+      xData[i] = rand() % 10000;   //edit this to be the x-coordinates of the points
+
   }
 
   for (i = 0; i <= nIntervals; i++) {
-      x0 = xData[i];
-      yData[i] = pow(x0,2.0);
+      yData[i] = rand() % 10000;   //edit this to be the y-coordinates of the points
   }
 
   plotResults(xData,yData,nIntervals);
@@ -42,7 +39,7 @@ void plotResults(double* xData, double* yData, int dataSize) {
   tempDataFileName = "graph";
   gnuplotPipe = popen("gnuplot","w");
   if (gnuplotPipe) {
-      fprintf(gnuplotPipe,"plot \"%s\" with lines\n",tempDataFileName);
+      fprintf(gnuplotPipe,"plot \"%s\" \n",tempDataFileName);
       fflush(gnuplotPipe);
       tempDataFile = fopen(tempDataFileName,"w");
       for (i=0; i <= dataSize; i++) {
