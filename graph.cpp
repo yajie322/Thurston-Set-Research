@@ -36,7 +36,7 @@ void plotResults(double* xData, double* yData, int dataSize) {
   char *tempDataFileName;
   double x,y;
   int i;
-  tempDataFileName = "graph";
+  tempDataFileName = "graph.txt";     //this will store all of the point external file. Change the name if necessary
   gnuplotPipe = popen("gnuplot","w");
   if (gnuplotPipe) {
       fprintf(gnuplotPipe,"plot \"%s\" \n",tempDataFileName);
@@ -48,10 +48,6 @@ void plotResults(double* xData, double* yData, int dataSize) {
           fprintf(tempDataFile,"%lf %lf\n",x,y);
       }
       fclose(tempDataFile);
-      printf("press enter to continue...");
-      getchar();
-      remove(tempDataFileName);
-      fprintf(gnuplotPipe,"exit \n");
   } else {
       printf("gnuplot not found...");
   }
