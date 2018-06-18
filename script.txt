@@ -1,0 +1,2 @@
+g++ -Wall -I/usr/local/include -c KLplots.cpp
+g++ -L/usr/local/lib KLplots.o -lgsl -lgslcblas -lm

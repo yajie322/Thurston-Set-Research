@@ -39,6 +39,8 @@ void plotResults(double* xData, double* yData, int dataSize) {
   tempDataFileName = "graph.txt";     //this will store all of the point external file. Change the name if necessary
   gnuplotPipe = popen("gnuplot","w");
   if (gnuplotPipe) {
+      fprintf(gnuplotPipe,"set terminal svg \n");
+      fprintf(gnuplotPipe,"set output 'plot.svg' \n");
       fprintf(gnuplotPipe,"plot \"%s\" lt rgb \"blue\" \n",tempDataFileName); //change the color of the points here
       fflush(gnuplotPipe);
       tempDataFile = fopen(tempDataFileName,"w");
@@ -47,6 +49,7 @@ void plotResults(double* xData, double* yData, int dataSize) {
           y = yData[i];
           fprintf(tempDataFile,"%lf %lf\n",x,y);
       }
+      fprintf(gnuplotPipe,"set out \n");
       fclose(tempDataFile);
   } else {
       printf("gnuplot not found...");

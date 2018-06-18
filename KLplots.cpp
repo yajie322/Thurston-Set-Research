@@ -162,11 +162,33 @@ vector<double> GetRootsByType(int m, int n) {
 
 
 int main() {
-	vector<double> results = GetRootsByType(2, 21);
-	for (vector<double>::iterator it = results.begin(); it != results.end(); ++it) {
-			cout << ' ' << *it;
-		}
-		cout << '\n';
+	vector<double> results = GetRootsByType(2, 20);
+	// for (vector<double>::iterator it = results.begin(); it != results.end(); ++it) {
+	// 		cout << ' ' << *it;
+	// 	}
+	// 	cout << '\n';
+
+	FILE *gnuplotPipe,*tempDataFile;
+	char *tempDataFileName;
+  	double x,y;
+  	tempDataFileName = "graph.txt";     //this will store all of the point external file. Change the name if necessary
+  	gnuplotPipe = popen("gnuplot","w");
+  	if (gnuplotPipe) {
+    	fprintf(gnuplotPipe,"set terminal svg \n");
+    	fprintf(gnuplotPipe,"set output 'plot.svg' \n");
+      fprintf(gnuplotPipe,"plot \"%s\" lt rgb \"blue\" \n",tempDataFileName); //change the color of the points here
+      fflush(gnuplotPipe);
+      tempDataFile = fopen(tempDataFileName,"w");
+      for (int i = 0; i < results.size(); i=i+2) {
+          x = results[i];
+          y = results[i+1];
+          fprintf(tempDataFile,"%lf %lf\n",x,y);
+      }
+      fprintf(gnuplotPipe,"set out \n");
+      fclose(tempDataFile);
+  } else {
+      printf("gnuplot not found...");
+  }
 
 	// for (vector<vector<int> >::iterator it = results.begin(); it != results.end(); ++it) {
 	// 	for (vector<int>::iterator it2 = it->begin(); it2 != it->end(); ++it2) {
