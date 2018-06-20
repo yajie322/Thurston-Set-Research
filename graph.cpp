@@ -1,4 +1,5 @@
 // Requires gnuplot in order to plot graphs
+// Also will require aqua within the terminal to produce graphs
 // Once the plot as been created, you will need to save the graph as a separate file.
 // Unfortunately, I could not make the code do this by default
 
@@ -11,7 +12,7 @@ void plotResults(double* xData, double* yData, int dataSize);
 
 int main() {
   int i = 0;
-  int nIntervals = 100000;        //edit this to be the number of total points
+  int nIntervals = 10000;        //edit this to be the number of total points
 
   double* xData = (double*) malloc((nIntervals+1)*sizeof(double));
   double* yData = (double*) malloc((nIntervals+1)*sizeof(double));
@@ -39,9 +40,7 @@ void plotResults(double* xData, double* yData, int dataSize) {
   tempDataFileName = "graph.txt";     //this will store all of the point external file. Change the name if necessary
   gnuplotPipe = popen("gnuplot","w");
   if (gnuplotPipe) {
-      fprintf(gnuplotPipe,"set terminal svg \n");
-      fprintf(gnuplotPipe,"set output 'plot.svg' \n");
-      fprintf(gnuplotPipe,"plot \"%s\" lt rgb \"blue\" \n",tempDataFileName); //change the color of the points here
+      fprintf(gnuplotPipe,"plot \"%s\" with points pointtype 0 lt rgb \"blue\" notitle \n",tempDataFileName); //change the color of the points here
       fflush(gnuplotPipe);
       tempDataFile = fopen(tempDataFileName,"w");
       for (i=0; i <= dataSize; i++) {
@@ -49,7 +48,6 @@ void plotResults(double* xData, double* yData, int dataSize) {
           y = yData[i];
           fprintf(tempDataFile,"%lf %lf\n",x,y);
       }
-      fprintf(gnuplotPipe,"set out \n");
       fclose(tempDataFile);
   } else {
       printf("gnuplot not found...");
