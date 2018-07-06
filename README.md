@@ -26,4 +26,4 @@ Then run the following commands (order matters!!)
 
 > ./a.out > FILENAME.png
 
-FILENAME can be anything you wish to call the output graph.
+FILENAME can be anything you wish to call the output graph. Finally you will find a png graph file in your working folder.
